@@ -19,3 +19,9 @@ def neuron_calculation(input_value: float, neuron_weight: float) -> float:
     :return: float between 0 and 1
     """
     return mt.tanh(input_value + neuron_weight)
+
+
+__all__ = [
+    "connection_strength",
+    "neuron_calculation"
+]
