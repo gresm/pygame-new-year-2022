@@ -83,6 +83,9 @@ class Network:
 
     neuron_connections: set[NeuralConnection]
 
+    def __hash__(self):
+        return hash(id(self))
+
     def _add_neuron(self, neuron: Neuron):
         if neuron.neuron_type == NeuronType.input_neuron:
             self.input_neurons.add(neuron)

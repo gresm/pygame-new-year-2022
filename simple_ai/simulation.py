@@ -66,8 +66,8 @@ class Simulation:
         self.exec(x, y, net.run_network(inp))
 
     def iterate(self, tile_type: int = TileType.entity):
-        for x in self.world.board:
-            for y in self.world.board[x]:
+        for x in range(self.world.board.shape[0]):
+            for y in range(self.world.board.shape[1]):
                 if self.world.board[x][y][0] == tile_type:
                     yield x, y, self.world.board[x][y][1]
 

@@ -1,6 +1,6 @@
 ai_max_iterations = 20
 clients_number = 50
-map_size = (50, 50)
+map_size = (50, 50, 2)
 learning_iterations_after_round = 10
 mutation_chance = 6
 randomness_scale = 100

@@ -13,7 +13,7 @@ class TileType:
 
 class World:
     def __init__(self):
-        self.board = np.full(cf.map_size, (TileType.nothing, None), dtype=[("tile_type", int), ("info", object)])
+        self.board = np.full(cf.map_size, (TileType.nothing, None), dtype=object)
 
     def _move(self, x1, y1, x2, y2):
         try:
@@ -30,8 +30,8 @@ class World:
         return self._move(x, y, x+dx, y+dy)
 
     def spawn(self):
-        x = rd.randint(0, self.board.shape[0])
-        y = rd.randint(0, self.board.shape[1])
+        x = rd.randint(0, self.board.shape[0] - 1)
+        y = rd.randint(0, self.board.shape[1] - 1)
         conn = rd.randint(0, cf.max_connections)
         input_neurons = rd.randint(0, cf.max_input_neurons)
         output_neurons = rd.randint(0, cf.max_output_neurons)
@@ -45,10 +45,10 @@ class World:
             if 0 <= neuron_id < input_neurons:
                 neuron_type = 0
             elif input_neurons <= neuron_id < input_neurons + output_neurons:
-                neuron_type = 3
+                neuron_type = 2
                 neuron_id -= input_neurons
             else:
-                neuron_type = 2
+                neuron_type = 1
                 neuron_id -= input_neurons + output_neurons
             return Neuron(NeuronType(neuron_type), neuron_id, 0)
 

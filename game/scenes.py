@@ -4,6 +4,8 @@ import pygame as pg
 
 from . import BaseScene, game, assets
 
+from simple_ai.simulation import Simulation
+
 
 class MainMenuScene(BaseScene):
     def update(self):
@@ -19,11 +21,16 @@ class MainMenuScene(BaseScene):
 
 
 class PlayScene(BaseScene):
+    simulation: Simulation
+
     def init(self, *args, **kwargs):
-        pass
+        self.simulation = Simulation()
 
     def update(self):
-        pass
+        self.simulation.step()
 
     def draw(self, surface: pg.Surface):
-        pass
+        for x, y, info in self.simulation.iterate():
+            px = x * 10 + 100
+            py = y * 10 + 100
+            pg.draw.rect(surface, (255, 255, 255), (px, py, 10, 10))
