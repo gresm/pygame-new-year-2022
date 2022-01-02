@@ -5,6 +5,7 @@ import pygame as pg
 from . import BaseScene, game, assets
 
 from simple_ai.simulation import Simulation
+# from simple_ai.simulation import TileType
 
 
 class MainMenuScene(BaseScene):
@@ -29,6 +30,13 @@ class PlayScene(BaseScene):
         self.killed_clients = 0
 
     def update(self):
+        # for ev in self.get_events():
+        #     if ev.type == pg.KEYDOWN:
+        #         if ev.key == pg.K_SPACE:
+        #             for x, y, _ in self.simulation.iterate():
+        #                 val = self.simulation.world.mutate(x, y)
+        #                 if val is not None:
+        #                     self.simulation.world.set((TileType.entity, val))
         pressed = pg.key.get_pressed()
 
         if pressed[pg.K_LEFT]:

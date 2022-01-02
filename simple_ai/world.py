@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random as rd
 import numpy as np
 
@@ -85,7 +87,7 @@ class World:
         serialized = network.serialize()
         self.board[x][y] = (TileType.entity, serialized)
 
-    def mutate(self, x: int, y: int):
+    def mutate(self, x: int, y: int) -> tuple[str, ...] | None:
         val = self.get(x, y)
 
         if val[0] != TileType.entity:
@@ -167,7 +169,7 @@ class World:
     def check_mutate(self, x: int, y: int):
         if rd.randint(0, cf.randomness_scale) <= cf.mutation_chance:
             return self.mutate(x, y)
-        return None
+        return self.get(x, y)[1]
 
 
 __all__ = [
