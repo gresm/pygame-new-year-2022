@@ -19,6 +19,8 @@ def frame(window: pg.Surface, delta_time: float):
 
     window.fill((0, 0, 0))
 
+    scenes.draw(window)
+
     pg.display.update()
 
 
