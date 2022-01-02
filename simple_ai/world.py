@@ -5,21 +5,22 @@ from . import configs as cf
 from .network import *
 
 
-class TileTypes:
+class TileType:
     nothing = 0
     entity = 1
+    wall = 2
 
 
-class Board:
+class World:
     def __init__(self):
-        self.board = np.full(cf.map_size, (TileTypes.nothing, None), dtype=[("tile_type", int), ("info", object)])
+        self.board = np.full(cf.map_size, (TileType.nothing, None), dtype=[("tile_type", int), ("info", object)])
 
     def _move(self, x1, y1, x2, y2):
         try:
             val = self.board[x1][y1]
-            if self.board[x2][y2][0] == TileTypes.nothing:
+            if self.board[x2][y2][0] == TileType.nothing:
                 self.board[x2][y2] = val
-                self.board[x1][y2] = (TileTypes.nothing, None)
+                self.board[x1][y2] = (TileType.nothing, None)
                 return True
             return False
         except IndexError:
@@ -79,7 +80,7 @@ class Board:
             pass
 
         serialized = network.serialize()
-        self.board[x][y] = (TileTypes.entity, serialized)
+        self.board[x][y] = (TileType.entity, serialized)
 
     def mutate(self, x: int, y: int):
         ser = self.board[x][y]
@@ -132,3 +133,14 @@ class Board:
             net.neuron_connections.remove(rd.choice(list(net.neuron_connections)))
 
         return net.serialize()
+
+    def get(self, x: int, y: int):
+        if 0 <= x < self.board.shape[0] and 0 <= y < self.board.shape[1]:
+            return self.board[x][y]
+        return TileType.wall, None
+
+
+__all__ = [
+    "TileType",
+    "World"
+]
