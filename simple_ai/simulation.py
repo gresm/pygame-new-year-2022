@@ -10,7 +10,7 @@ import random as rd
 class Simulation:
     def __init__(self):
         self.world = World()
-        self.player_pos = (0, 0)
+        self.player_pos = (self.world.board.shape[0]//2,  self.world.board.shape[1]//2)
 
         for _ in range(cf.clients_number):
             self.world.spawn()
@@ -47,7 +47,7 @@ class Simulation:
         dx = 0
         dy = 0
         for el in out:
-            if el.neuron_strength > 0.5:
+            if el.neuron_strength > 0.25:
                 if el.neuron_id == 0:
                     dx -= 1
                 if el.neuron_id == 1:
@@ -74,3 +74,10 @@ class Simulation:
     def step(self):
         for x, y, data in self.iterate():
             self.run(x, y)
+
+    def move_player(self, dx, dy):
+        nx = self.player_pos[0] + dx
+        ny = self.player_pos[1] + dy
+
+        if self.world.inside(nx, ny):
+            self.player_pos = (nx, ny)

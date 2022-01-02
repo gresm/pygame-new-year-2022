@@ -16,15 +16,18 @@ class World:
         self.board = np.full(cf.map_size, (TileType.nothing, None), dtype=object)
 
     def _move(self, x1, y1, x2, y2):
-        try:
-            val = self.board[x1][y1]
-            if self.board[x2][y2][0] == TileType.nothing:
-                self.board[x2][y2] = val
-                self.board[x1][y2] = (TileType.nothing, None)
-                return True
+        x2 %= self.board.shape[0]
+        y2 %= self.board.shape[1]
+
+        if self.get(x1, y1)[0] == TileType.wall:
             return False
-        except IndexError:
+
+        if self.get(x2, y2)[0] != TileType.nothing:
             return False
+
+        self.set(x2, y2, self.get(x1, y1))
+        self.set(x1, y1, (0, None))
+        return True
 
     def move(self, x: int, y: int, dx: int, dy: int):
         return self._move(x, y, x+dx, y+dy)
@@ -83,8 +86,23 @@ class World:
         self.board[x][y] = (TileType.entity, serialized)
 
     def mutate(self, x: int, y: int):
-        ser = self.board[x][y]
-        net = Network.deserialize(ser)
+        val = self.get(x, y)
+
+        if val[0] != TileType.entity:
+            return val[1]
+        ret = val[1]
+
+        for _ in range(rd.randint(1, cf.mutation_max_iterations)):
+            try:
+                ret = self._mutate(ret)
+            except IndexError:
+                pass
+        return ret
+
+    @staticmethod
+    def _mutate(net):
+        # noinspection PyTypeChecker
+        net = Network.deserialize(net)
         action = rd.randint(0, 3)
 
         if action == 0:
@@ -135,9 +153,21 @@ class World:
         return net.serialize()
 
     def get(self, x: int, y: int):
-        if 0 <= x < self.board.shape[0] and 0 <= y < self.board.shape[1]:
+        if self.inside(x, y):
             return self.board[x][y]
         return TileType.wall, None
+
+    def set(self, x: int, y: int, val):
+        if self.inside(x, y):
+            self.board[x][y] = val
+
+    def inside(self, x: int, y: int):
+        return 0 <= x < self.board.shape[0] and 0 <= y < self.board.shape[1]
+
+    def check_mutate(self, x: int, y: int):
+        if rd.randint(0, cf.randomness_scale) <= cf.mutation_chance:
+            return self.mutate(x, y)
+        return None
 
 
 __all__ = [

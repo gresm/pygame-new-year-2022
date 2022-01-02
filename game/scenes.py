@@ -22,15 +22,41 @@ class MainMenuScene(BaseScene):
 
 class PlayScene(BaseScene):
     simulation: Simulation
+    killed_clients: int
 
     def init(self, *args, **kwargs):
         self.simulation = Simulation()
+        self.killed_clients = 0
 
     def update(self):
+        pressed = pg.key.get_pressed()
+
+        if pressed[pg.K_LEFT]:
+            self.simulation.move_player(-1, 0)
+
+        if pressed[pg.K_UP]:
+            self.simulation.move_player(0, -1)
+
+        if pressed[pg.K_RIGHT]:
+            self.simulation.move_player(1, 0)
+
+        if pressed[pg.K_DOWN]:
+            self.simulation.move_player(0, 1)
+
         self.simulation.step()
 
     def draw(self, surface: pg.Surface):
+        scale = 10
+        offset = 150
         for x, y, info in self.simulation.iterate():
-            px = x * 10 + 100
-            py = y * 10 + 100
-            pg.draw.rect(surface, (255, 255, 255), (px, py, 10, 10))
+            px = x * scale + offset
+            py = y * scale + offset
+            surface.blit(assets.game_neuron_rect, (px, py))
+
+        surface.blit(
+            assets.game_player_rect,
+            (
+                self.simulation.player_pos[0] * scale + offset,
+                self.simulation.player_pos[1] * scale + offset
+            )
+        )
