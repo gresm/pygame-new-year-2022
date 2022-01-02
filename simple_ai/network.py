@@ -146,11 +146,19 @@ class Network:
             self.add_connection(el, pretty)
 
     @classmethod
-    def _get(cls):
+    def get(cls):
         return cls(set(), set(), set(), set())
 
     @classmethod
     def deserialize(cls, text: tuple[str], pretty: bool = True):
-        ret = cls._get()
+        ret = cls.get()
         ret.deserialize_ip(text, pretty)
         return ret
+
+
+__all__ = [
+    "NeuronType",
+    "Neuron",
+    "NeuralConnection",
+    "Network"
+]
