@@ -1,6 +1,6 @@
 ai_max_iterations = 20
 clients_number = 100
-required_alive_clients = 20
+required_alive_clients = 50
 map_size = (50, 50, 2)
 learning_iterations_after_round = 10
 mutation_chance = 6

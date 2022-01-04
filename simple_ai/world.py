@@ -96,13 +96,22 @@ class World:
 
         for _ in range(rd.randint(1, cf.mutation_max_iterations)):
             try:
-                ret = self._mutate(ret)
+                ret = self._raw_mutate(ret)
+            except IndexError:
+                pass
+        return ret
+
+    def raw_mutate(self, net: tuple[str, ...]):
+        ret = net
+        for _ in range(rd.randint(1, cf.mutation_max_iterations)):
+            try:
+                ret = self._raw_mutate(ret)
             except IndexError:
                 pass
         return ret
 
     @staticmethod
-    def _mutate(net):
+    def _raw_mutate(net: tuple[str, ...]):
         # noinspection PyTypeChecker
         net = Network.deserialize(net)
         action = rd.randint(0, 3)
@@ -154,14 +163,18 @@ class World:
 
         return net.serialize()
 
-    def get(self, x: int, y: int):
+    def get(self, x: int, y: int) -> tuple[int, tuple[str, ...]] | tuple[int, None]:
         if self.inside(x, y):
             return self.board[x][y]
         return TileType.wall, None
 
     def set(self, x: int, y: int, val):
         if self.inside(x, y):
-            self.board[x][y] = val
+            try:
+                self.board[x][y] = val
+            except ValueError as e:
+                print(x, y, val)
+                raise e
 
     def inside(self, x: int, y: int):
         return 0 <= x < self.board.shape[0] and 0 <= y < self.board.shape[1]
@@ -170,6 +183,16 @@ class World:
         if rd.randint(0, cf.randomness_scale) <= cf.mutation_chance:
             return self.mutate(x, y)
         return self.get(x, y)[1]
+
+    def check_raw_mutate(self, net: tuple[str, ...]):
+        if rd.randint(0, cf.randomness_scale) <= cf.mutation_chance:
+            return self.raw_mutate(net)
+        return net
+
+    def respawn_random_where(self, val):
+        x = rd.randint(0, self.board.shape[0])
+        y = rd.randint(0, self.board.shape[1])
+        self.set(x, y, val)
 
 
 __all__ = [

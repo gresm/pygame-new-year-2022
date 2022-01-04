@@ -12,9 +12,6 @@ class Simulation:
         self.world = World()
         self.player_pos = (self.world.board.shape[0]//2,  self.world.board.shape[1]//2)
 
-        for _ in range(cf.clients_number):
-            self.world.spawn()
-
     def get_inputs(self, x: int, y: int) -> list[float]:
         ret: list[float] = [0 for _ in range(10)]
 
@@ -43,6 +40,10 @@ class Simulation:
 
         return ret
 
+    def init(self):
+        for _ in range(cf.clients_number):
+            self.world.spawn()
+
     def exec(self, x, y, out: set[Neuron]):
         dx = 0
         dy = 0
@@ -69,7 +70,7 @@ class Simulation:
         for x in range(self.world.board.shape[0]):
             for y in range(self.world.board.shape[1]):
                 if self.world.board[x][y][0] == tile_type:
-                    yield x, y, self.world.board[x][y][1]
+                    yield x, y, self.world.get(x, y)[1]
 
     def step(self):
         for x, y, data in self.iterate():
@@ -81,3 +82,19 @@ class Simulation:
 
         if self.world.inside(nx, ny):
             self.player_pos = (nx, ny)
+
+    def restart_world(self, required_clients: int):
+        clients = list(self.iterate())
+        self.world = World()
+        self.player_pos = (self.world.board.shape[0] // 2, self.world.board.shape[1] // 2)
+
+        for _, _, cl in clients:
+            self.world.respawn_random_where((TileType.entity, self.world.check_raw_mutate(cl)))
+
+        try:
+            for _ in range(required_clients - len(clients)):
+                client = rd.choice(clients)
+                self.world.respawn_random_where((TileType.entity, self.world.check_raw_mutate(client[2])))
+        except IndexError:
+            # somehow there are no clients in the world
+            self.init()
