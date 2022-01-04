@@ -26,8 +26,11 @@ class GameState:
     def run(self):
         while self.running:
             if self._frame is not None:
-                ms = self.clock.tick()
-                self._frame(window, ms/self.max_fps)  # probably you are missing "window" and "delta_time" arguments
+                if max_fps != -1:
+                    ms = self.clock.tick(max_fps)
+                else:
+                    ms = self.clock.tick()
+                self._frame(screen, ms / self.max_fps)  # probably you are missing "window" and "delta_time" arguments
             else:
                 warn("Running without specified frame executor")
                 break
@@ -35,12 +38,12 @@ class GameState:
 
 size = (800, 800)
 max_fps = 60
-window = pg.display.set_mode(size)
+screen = pg.display.set_mode(size)
 game = GameState(max_fps)
 
 __all__ = [
     "size",
     "max_fps",
-    "window",
+    "screen",
     "game"
 ]
