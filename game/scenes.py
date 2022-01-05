@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import random as rd
+
 import pygame as pg
 
 from . import BaseScene, game, assets
@@ -68,14 +68,15 @@ class PlayScene(BaseScene):
 
     def remove_eaten_by_player(self):
         self.del_relative(0, 0)
-        self.del_relative(-1, 0)
-        self.del_relative(1, 0)
-        self.del_relative(0, -1)
-        self.del_relative(0, 1)
-        self.del_relative(-1, -1)
-        self.del_relative(-1, 1)
-        self.del_relative(1, -1)
-        self.del_relative(1, 1)
+        if not self.is_bot_turn:
+            self.del_relative(-1, 0)
+            self.del_relative(1, 0)
+            self.del_relative(0, -1)
+            self.del_relative(0, 1)
+            self.del_relative(-1, -1)
+            self.del_relative(-1, 1)
+            self.del_relative(1, -1)
+            self.del_relative(1, 1)
 
     def update(self):
         self.simulation.step()
@@ -102,10 +103,11 @@ class PlayScene(BaseScene):
         try:
             if self.bot_focusing_left_moves > 0:
                 self.bot_focusing_left_moves -= 1
-                if self.simulation.world.get(*self.bot_point_focused)[0] != TileType.entity:
+                if self.simulation.world.get(*self.bot_point_focused)[0] == TileType.entity:
+                    return self.bot_point_focused
+                else:
                     self.bot_focusing_left_moves = 0
-                return self.bot_point_focused
-            chosen = rd.choice(list(best))
+            chosen = list(best)[0]
             self.bot_point_focused = chosen
             self.bot_focusing_left_moves = configs.bot_focused_by
         except IndexError:
