@@ -1,6 +1,6 @@
 ai_max_iterations = 20
 clients_number = 50
-required_alive_clients = 20
+required_alive_clients = 40
 map_size = (50, 50, 2)
 learning_iterations_after_round = 5
 bot_max_steps = 500
@@ -8,7 +8,7 @@ bot_focused_by = 10
 mutation_chance = 1
 mutation_max_iterations = 10
 randomness_scale = 100
-max_connections = 30
+max_connections = 25
 max_input_neurons = 10
 max_output_neurons = 10
 max_hidden_neurons = 20

@@ -35,6 +35,7 @@ class PlayScene(BaseScene):
     killed_clients: int
     max_killed_clients: int
     bot_steps: int
+    bot_turns: int
     bot_point_focused: tuple[int, int]
     bot_focusing_left_moves: int
     is_bot_turn: bool
@@ -45,7 +46,8 @@ class PlayScene(BaseScene):
         self.killed_clients = 0
         self.max_killed_clients = configs.clients_number - configs.required_alive_clients
         self.bot_steps = 0
-        self.is_bot_turn = True
+        self.bot_turns = 0
+        self.is_bot_turn = False
         self.bot_point_focused = (0, 0)
         self.bot_focusing_left_moves = 0
 
@@ -60,8 +62,21 @@ class PlayScene(BaseScene):
         if self.killed_clients < self.max_killed_clients:
             self._check_del(x, y)
         else:
-            self.simulation.restart_world(configs.clients_number)
-            self.killed_clients = 0
+            self.restart()
+
+    def restart(self):
+        self.simulation.restart_world(configs.clients_number)
+        self.killed_clients = 0
+
+        if self.is_bot_turn:
+            self.bot_steps = 0
+            self.bot_turns += 1
+            if self.bot_turns > configs.learning_iterations_after_round:
+                self.is_bot_turn = False
+                self.bot_turns = 0
+        else:
+            self.is_bot_turn = True
+            self.bot_turns = 0
 
     def del_relative(self, x: int, y: int):
         self._safe_check_del(x + self.simulation.player_pos[0], y + self.simulation.player_pos[1])
@@ -127,6 +142,11 @@ class PlayScene(BaseScene):
     def update_bot(self):
         self.simulation.move_player(*self.bot_movement())
         self.remove_eaten_by_player()
+
+        self.bot_steps += 1
+
+        if self.bot_steps >= configs.bot_max_steps:
+            self.restart()
 
     def update_player(self):
         pressed = pg.key.get_pressed()
